@@ -2,13 +2,10 @@
 layout: null
 ---
 [
-  {% for recipe in site.pages %}
-    {% if recipe.title and recipe.url contains "recipe" %}
-    {
-      "title": {{ recipe.title | jsonify }},
-      "url": {{ recipe.url | jsonify }},
-      "content": {{ recipe.content | strip_html | jsonify }}
-    }{% unless forloop.last %},{% endunless %}
-    {% endif %}
-  {% endfor %}
+  {% assign content = site.pages | where: "url", "/" | first %}
+  {
+    "title": "Все рецепты",
+    "url": "/",
+    "content": {{ content.content | strip_html | jsonify }}
+  }
 ]
