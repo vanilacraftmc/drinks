@@ -1,0 +1,61 @@
+---
+layout: default
+title: Поиск рецептов
+---
+
+<h1>Поиск рецептов</h1>
+
+<input type="text" id="search-input" placeholder="Введи название или эффект..." autocomplete="off">
+<div id="results"></div>
+
+<script src="https://unpkg.com/lunr/lunr.js"></script>
+<script>
+  let idx;
+  let docs = [];
+
+  fetch('{{ "/search.json" | relative_url }}')
+    .then(res => res.json())
+    .then(data => {
+      docs = data;
+      idx = lunr(function () {
+        this.ref('id');
+        this.field('title');
+        this.field('content');
+
+        docs.forEach(function (doc, i) {
+          doc.id = i;
+          this.add(doc);
+        }, this);
+      });
+
+      const input = document.getElementById('search-input');
+      const results = document.getElementById('results');
+
+      input.addEventListener('input', function () {
+        const query = this.value.trim();
+        results.innerHTML = '';
+
+        if (query.length < 2) return;
+
+        let matches;
+        try {
+          matches = idx.search(query + '*');
+        } catch (e) {
+          matches = idx.search(query);
+        }
+
+        if (matches.length === 0) {
+          results.innerHTML = '<p>Ничего не найдено.</p>';
+          return;
+        }
+
+        matches.forEach(function (m) {
+          const doc = docs[m.ref];
+          const div = document.createElement('div');
+          div.className = 'search-result';
+          div.innerHTML = '<h3>' + doc.title + '</h3><p>' + doc.content + '</p>';
+          results.appendChild(div);
+        });
+      });
+    });
+</script>
