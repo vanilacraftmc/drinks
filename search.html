@@ -18,12 +18,11 @@ title: Поиск рецептов
     .then(data => {
       docs = data;
       idx = lunr(function () {
-        this.ref('id');
+        this.ref('url');
         this.field('title');
         this.field('content');
 
-        docs.forEach(function (doc, i) {
-          doc.id = i;
+        docs.forEach(function (doc) {
           this.add(doc);
         }, this);
       });
@@ -50,12 +49,26 @@ title: Поиск рецептов
         }
 
         matches.forEach(function (m) {
-          const doc = docs[m.ref];
-          const div = document.createElement('div');
-          div.className = 'search-result';
-          div.innerHTML = '<h3>' + doc.title + '</h3><p>' + doc.content + '</p>';
-          results.appendChild(div);
+          const doc = docs.find(d => d.url === m.ref);
+          if (!doc) return;
+
+          // Разбиваем содержимое на рецепты и ищем только те, где есть совпадение
+          const blocks = doc.content.split(/- /).filter(b => b.trim().length > 0);
+          const queryLower = query.toLowerCase();
+
+          blocks.forEach(function (block) {
+            if (block.toLowerCase().includes(queryLower)) {
+              const div = document.createElement('div');
+              div.className = 'search-result';
+              div.innerHTML = '<pre>' + block.trim() + '</pre>';
+              results.appendChild(div);
+            }
+          });
         });
+
+        if (results.innerHTML === '') {
+          results.innerHTML = '<p>Ничего не найдено.</p>';
+        }
       });
     });
 </script>
