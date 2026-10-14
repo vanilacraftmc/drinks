@@ -1,0 +1,19 @@
+title: VanilaCraft Wiki
+description: Рецепты напитков сервера VanilaCraft
+url: "https://vanilacraftmc.github.io"
+baseurl: ""
+
+# Тема не нужна — у нас свой шаблон
+theme: null
+
+# Чтобы Jekyll собирал страницы без проблем
+plugins:
+  - jekyll-feed
+
+# Разрешить генерацию search.json
+include:
+  - search.json
+
+# Исключить лишнее
+exclude:
+  - README.md
